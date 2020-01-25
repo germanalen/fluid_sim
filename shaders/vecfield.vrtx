@@ -1,0 +1,29 @@
+#version 330 core
+
+uniform mat4 proj;
+uniform mat4 view;
+uniform mat4 model;
+uniform vec3 dirs[1000];
+uniform float max_len;
+
+in vec3 in_vert;
+
+out float len;
+out vec3 f_in_vert;
+
+void main() {
+    f_in_vert = in_vert;
+    int i = gl_InstanceID;
+    vec3 offset;
+    offset.z = i % 10; i /= 10;
+    offset.y = i % 10; i /= 10;
+    offset.x = i;
+    offset = (offset + .5) / 10 - .5;
+
+    vec3 dir = dirs[gl_InstanceID];
+
+    len = length(dir);
+
+    vec3 m_vert = in_vert * dir / max_len * .03f + offset;
+    gl_Position = proj * view * model * vec4(m_vert, 1.0);
+}

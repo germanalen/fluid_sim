@@ -1,0 +1,26 @@
+#version 330 core
+
+uniform float max_len;
+
+in float len;
+in vec3 f_in_vert;
+out vec4 color;
+
+
+//////////////////////////////////////////////////
+// the last color is not part of the color ramp
+vec4 colormap_colors[4] = vec4[](vec4(0,0,1,1),vec4(0,1,0,1),vec4(1,0,0,1),vec4(0));
+vec4 colormap(float v) {
+    v *= (colormap_colors.length() - 2);
+    int i = int(v);
+    return mix(colormap_colors[i], colormap_colors[i+1], fract(v));
+}
+//////////////////////////////////////////////////
+
+
+void main() {
+    //color = colormap(len/max_len);
+    color = vec4(vec3(f_in_vert.x),1);
+    //color = vec4(1);
+}
+

@@ -1,0 +1,19 @@
+#version 330 core
+
+uniform mat4 proj;
+uniform mat4 view;
+uniform mat4 model;
+uniform float scale;
+
+in vec2 in_vert;
+in vec3 offset;
+
+out vec2 uv;
+out vec3 view_space_pos;
+
+void main() {
+    uv = in_vert;
+    view_space_pos = vec3(view * model * vec4(offset,1));
+    vec3 m_vert = vec3(in_vert-.5,0) * scale + view_space_pos;
+    gl_Position = proj * vec4(m_vert,1);
+}

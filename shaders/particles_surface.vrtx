@@ -1,0 +1,11 @@
+#version 330 core
+
+in vec2 in_vert;
+
+
+out vec2 uv;
+
+void main() {
+    uv = in_vert;
+    gl_Position = vec4(in_vert * 2 - 1, 0, 1);
+}

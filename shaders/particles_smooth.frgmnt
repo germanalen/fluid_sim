@@ -1,0 +1,50 @@
+#version 330 core
+
+uniform mat4 proj;
+uniform sampler2D depth_texture;
+uniform vec2 dir;
+uniform float scale;
+
+in vec2 uv;
+
+
+
+void main() {
+    float depth = texture(depth_texture, uv).r;
+    if (depth == 0) discard;
+
+    
+    float focal_length = proj[0][0];
+    float apparent_size = scale * focal_length / depth; // diameter as a fraction of screen or smth (not sure)
+    //gl_FragColor = vec4(apparent_size, 0, 0, 1);
+    //return;
+
+    ivec2 depth_texture_size = textureSize(depth_texture, 0);
+    vec2 texel_size = 1.0f/depth_texture_size;
+
+    float filter_radius = depth_texture_size.y * apparent_size * 1;
+    
+    float sum = 0;
+    float wsum = 0;
+
+    for (float i=-filter_radius; i<=filter_radius; i+=1.0f) {
+        float sample = texture(depth_texture, uv + i * (dir * texel_size)).r;
+        float drawn = sample == 0 ? 0 : 1;
+
+        float r = i * .01;
+        float w = exp(-r*r);
+
+        float r2 = (sample - depth) * 5;
+        float g = exp(-r2*r2);
+
+        sum += sample * w * g * drawn;
+        wsum += w * g * drawn;
+    }
+
+    if (wsum > 0)
+        sum /= wsum;
+
+
+    gl_FragColor = vec4(sum, 0, 0, 1);
+}
+

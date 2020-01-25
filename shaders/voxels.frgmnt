@@ -1,0 +1,154 @@
+#version 330 core
+
+uniform mat4 proj;
+uniform mat4 view;
+uniform mat4 model;
+uniform mat3 normal_matrix;
+uniform mat3 inv_normal_matrix;
+uniform sampler3D voxels;
+uniform ivec3 grid_shape;
+
+in vec3 m_vert;
+
+out vec4 out_depth;
+out vec4 out_normal;
+
+
+
+//////////////////////////////////////////////////
+vec4 colormap_colors[5] = vec4[](vec4(1,1,1,1),vec4(0,0,1,1),vec4(0,0,0,0),vec4(1,0,0,1),vec4(1,1,1,1));
+vec4 colormap(float v) {
+    v  = v + 2;
+    int i = int(v);
+    return mix(colormap_colors[i], colormap_colors[i+1], fract(v));
+}
+//////////////////////////////////////////////////
+
+
+
+
+vec3 lighting(in vec3 v_pos, in vec3 v_normal) {
+    vec3 v_light = mat3(view) * normalize(vec3(0.1,1,0.5));
+    vec3 v_ray = -v_pos;
+    vec3 v_reflect = reflect(v_light, v_normal); 
+
+    float specular = pow(max(dot(v_ray, v_reflect), 0), 256);
+    float diffuse = max(0, dot(v_light, v_normal));
+    float ambient = 0.2;
+    return vec3(0.2,0.3,0.9) * (ambient + diffuse * 0.8 + specular * 0.0);
+}
+
+
+
+
+void main() {
+    vec3 t_vert = m_vert + vec3(0.5);
+    
+    vec3 v_vert = (view * model * vec4(m_vert, 1.0)).xyz;
+    vec3 v_ray = normalize(v_vert);
+    vec3 m_ray = inv_normal_matrix * v_ray;
+    
+    //float ray_len = 2;
+    //int num_steps = 200;
+    //float opt = 0;
+    //for(int i = 0; i < num_steps; ++i) {
+    //    vec3 pos = t_vert + m_ray * ray_len * float(i)/num_steps;
+    //    float voxel = texelFetch(voxels, ivec3(grid_shape * pos.zyx), 0).r;
+    //    if (voxel >= .5) {
+    //        opt += ray_len/num_steps * grid_shape.x;
+    //    }
+    //}
+    //color = vec4(vec3(opt*.1),1);
+    //return;
+
+    // DDA
+    // https://www.scratchapixel.com/lessons/advanced-rendering/introduction-acceleration-structure/grid
+    vec3 origin = t_vert * grid_shape;
+    vec3 ray = m_ray;
+    vec3 dt = abs(1/ray);
+    vec3 t_; // t intersections
+    ivec3 cell = ivec3(origin);
+    ivec3 dcell;
+
+    
+
+
+    for (int i = 0; i < 3; ++i) {
+        if (ray[i] > 0) {
+            t_[i] = (1 - fract(origin[i]))/ray[i];
+            dcell[i] = 1;
+        } else {
+            t_[i] = -fract(origin[i])/ray[i];
+            dcell[i] = -1;
+        }
+    }
+
+    //color = vec4(0);
+    out_depth = vec4(0);
+
+    bool tracing = true;
+    int iters = 0;
+    while (tracing) {
+        int min_i = 0;
+        for (int i = 0; i < 3; ++i) {
+            if (t_[i] < t_[min_i])
+                min_i = i;
+        }
+
+        t_[min_i] += dt[min_i];
+        cell[min_i] += dcell[min_i];
+
+        // for some reason x and z axes are switched in voxels
+        // so i just added .zyx
+        float voxel = texelFetch(voxels, cell.zyx, 0).r;
+        if (abs(voxel) > 0.0) {
+            //color = vec4(1,1,1,1);
+            vec3 m_normal = vec3(0);
+            m_normal[min_i] = -dcell[min_i];
+            vec3 v_pos = vec3(view * model * vec4(vec3(cell)/grid_shape-.5,1));
+            vec3 v_normal = normal_matrix * m_normal;
+            out_depth.r = -v_pos.z;
+            out_normal.xyz = v_normal;
+            //color = vec4(lighting(v_pos, v_normal), 1);
+            //color = colormap(voxel);
+            tracing = false;
+        }
+        //color += colormap(voxel);
+
+        
+        for (int i = 0; i < 3; ++i) {
+            // out of grid bounds
+            if (cell[i] < 0 || grid_shape[i] <= cell[i]) {
+                //color = vec4(0,0,0,1);
+                tracing = false;
+            }
+        }
+        iters++;
+    }
+    
+
+    // check performance
+    // if there are no red pixels the performance is as expected
+    #if 0
+    float iters_per_cell = 3;
+    float cells = max(grid_shape.x, max(grid_shape.y, grid_shape.z));
+    color = vec4(vec3(iters/(iters_per_cell * cells)),1);
+    if (color.r > 1)
+        color = vec4(1,0,0,1);
+    #endif
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

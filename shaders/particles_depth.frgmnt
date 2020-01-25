@@ -1,0 +1,30 @@
+#version 330 core
+
+uniform mat4 proj;
+uniform mat4 view;
+uniform float scale;
+
+in vec2 uv;
+in vec3 view_space_pos;
+
+
+void main() {
+    vec3 N;
+    N.xy = uv * 2 - 1;
+    float r2 = dot(N.xy, N.xy);
+    if (r2 > 1) discard;
+    N.z = sqrt(1 - r2);
+
+
+    vec4 pixel_pos = vec4(view_space_pos + N * scale/2, 1);
+    vec4 clip_space_pos = proj * pixel_pos;
+    gl_FragDepth = clip_space_pos.z / clip_space_pos.w;
+
+    //vec3 light_dir = normalize(vec3(1,1,1));
+    //float diffuse = max(0, dot(N, mat3(view) * light_dir));
+    //gl_FragColor = vec4(vec3(diffuse), 1);
+    //gl_FragColor = vec4(vec3(gl_FragDepth), 1);
+    gl_FragColor.r = max(0, -pixel_pos.z);
+    //gl_FragColor = vec4(pixel_pos.xy, -pixel_pos.z, 1);
+}
+

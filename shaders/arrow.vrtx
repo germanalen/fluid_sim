@@ -1,0 +1,16 @@
+#version 330 core
+
+uniform mat4 proj;
+uniform mat4 view;
+uniform mat4 model;
+uniform vec3 pos;
+uniform vec3 dir;
+uniform float max_len;
+
+in vec3 in_vert;
+
+
+void main() {
+    vec3 m_vert = in_vert * dir / max_len * .03f + pos;
+    gl_Position = proj * view * model * vec4(m_vert, 1.0);
+}

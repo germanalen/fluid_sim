@@ -1,0 +1,14 @@
+#version 330 core
+
+uniform mat4 proj;
+uniform mat4 view;
+uniform mat4 model;
+
+in vec3 in_vert;
+
+out vec3 m_vert;
+
+void main() {
+    m_vert = in_vert;
+    gl_Position = proj * view * model * vec4(in_vert, 1.0);
+}
