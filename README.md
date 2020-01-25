@@ -14,3 +14,5 @@ Video: https://youtu.be/Yq4zrmvY-To
 
 # Compiling
 If you're on Ubuntu install libglew-dev, libsdl2-dev, libglm-dev and run make.
+
+To run, launch build/sim.out.
