@@ -7,6 +7,7 @@ Pressure solver is done according to Appendix B2 of [Introduction to the Conjuga
 
 
 I am not very good at math, but I understood just enough to get it working.
+It runs on CPU and is far from efficient.
 
 Video: https://youtu.be/Yq4zrmvY-To
 
