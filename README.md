@@ -1,5 +1,5 @@
 # Description
-A fluid simulation based on [Fluid Simulation course notes](https://www.cs.ubc.ca/~rbridson/fluidsimulation/fluids_notes.pdf) by Bridson and Fischer.
+A fluid simulation based on [Fluid Simulation course notes](https://www.cs.ubc.ca/~rbridson/fluidsimulation/fluids_notes.pdf) by Bridson and Müller-Fischer.
 
 Screen space renderer is done according to [Screen Space Fluid Rendering For Games](http://developer.download.nvidia.com/presentations/2010/gdc/Direct3D_Effects.pdf) by Simon Green.
 
