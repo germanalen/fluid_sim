@@ -6,6 +6,7 @@ Screen space renderer is done according to [Screen Space Fluid Rendering For Gam
 Pressure solver is done according to Appendix B2 of [Introduction to the Conjugate Gradient Method Without the Agonizing Pain](https://www.cs.cmu.edu/~quake-papers/painless-conjugate-gradient.pdf) by Jonathan Richard Shewchuk.
 
 The sim runs on CPU and is far from efficient.
+
 Video: https://youtu.be/Yq4zrmvY-To
 
 
