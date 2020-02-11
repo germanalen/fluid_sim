@@ -13,6 +13,6 @@ The sim runs on CPU and is far from efficient.
 
 
 # Compiling
-If you're on Ubuntu install libglew-dev, libsdl2-dev, libglm-dev and run make.
+If you're on Ubuntu install libglew-dev, libsdl2-dev, libglm-dev and run make clean && make.
 
 To run, launch build/sim.out.
